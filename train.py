@@ -40,6 +40,10 @@ def 	trainThetas(X, Y, learningRate=0.001, iterationsNum=1500):
 
 	return (iterations, thetasHistory)
 
+def	addBiasUnit(arr):
+	bias_arr = np.ones((arr.shape[0],), dtype=float)
+	return (np.vstack((bias_arr, arr)).T)
+
 def     main(dataset):
 	global thetas
 
@@ -58,9 +62,8 @@ def     main(dataset):
 	#X = meanNormalization(X)
 
 	# adding bias column to X data
-	bias_arr = np.ones((Y.shape[0],), dtype=int)
-	X = np.vstack((bias_arr, X)).T
-
+	X = addBiasUnit(X)
+	print(X)
 	[history, iterations] = trainThetas(X, Y)
 
 	plt.plot(iterations, history)
@@ -69,9 +72,10 @@ def     main(dataset):
 	plt.show()
 	
 	data, = plt.plot(X[:, 1], Y, 'bo', label='Training data')
-	dummy = np.linspace(0, 1, 100)
-	
-	plt.plot(dummy, thetas[0] + dummy * thetas[1], 'r')
+	dummy_x = addBiasUnit(np.linspace(np.min(X), np.max(X), 100))
+	print(dummy_x)
+	plt.plot(dummy_x, dummy_x.dot(thetas))
+			#thetas[0] + (dummy_x * thetas[1]), 'r')
 	plt.ylabel('Price')
 	plt.xlabel('Mileage')
 	plt.legend()

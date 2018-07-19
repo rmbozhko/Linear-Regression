@@ -1,6 +1,5 @@
 import numpy as np
-from train import h_function
-
+from train import h_function, featureScaling, meanNormalization
 def main():
 	while 1:
 		try:
@@ -12,8 +11,9 @@ def main():
 				thetas = f.readlines()
 			thetas = [theta.strip('\n') for theta in thetas]
 			thetas = [float(theta) for theta in thetas]
+			X = featureScaling(X)
 			X = np.vstack((np.ones((1,), dtype=float), X)).T
-			result = X.dot(thetas)#h_function(X)
+			result = X.dot(thetas)
 			print(thetas)
 			print(X)
 			print(result)
