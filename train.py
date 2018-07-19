@@ -16,14 +16,19 @@ def 	computeCost(X, Y):
 
 	J = h_function(X)
 	J = np.sum(np.square(J - Y)) / (2 * Y.shape[0])
-	#print("Cost function result: {}".format(J))
 	return (J)
 
 def 	h_function(X):
 	global thetas
 	return (X.dot(thetas))
 
-def 	trainThetas(X, Y, learningRate=0.001, iterationsNum=1500):
+#def	normalEquation(X, Y):
+#	thetas = np.zeros(2)
+
+#	thetas[1] = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y)
+#	print(thetas)
+
+def 	gradientDescent(X, Y, learningRate=0.0001, iterationsNum=1500):
 	global thetas
 	# in case, when we have only one feature in X, we can assign m to X.size,
 	# otherwise we should specify the axis of X which we are going to assign
@@ -44,10 +49,38 @@ def	addBiasUnit(arr):
 	bias_arr = np.ones((arr.shape[0],), dtype=float)
 	return (np.vstack((bias_arr, arr)).T)
 
+def	calcAccuracy(X, Y, logReg=True):
+	global thetas
+	
+	if logReg:
+		temp_y = X.dot(thetas)
+		pred = np.mean(Y == temp_y) * 100
+	else:
+		pred = int(np.sum(Y - X.dot(thetas)))
+	return (pred)
+
+def	computeThetas(X, y):
+	
+	# adding bias column to X data
+	X = addBiasUnit(X)
+	
+	diff = 1
+	learningRate = 1.0
+	step = 0.1
+	
+	# determing best-fitting learningRate using brute-force	
+	while diff > 0.0001:
+		for i in range(9):
+			if diff <= 0.0001:
+				break
+			learningRate = learningRate - step
+			[history, iterations] = gradientDescent(X, y, 0.5)
+			diff = calcAccuracy(X, y, False)
+		step = step * 0.1
+	return ([history, iterations])
+
 def     main(dataset):
 	global thetas
-
-	iterationsNum = 1500
 
 	# reading data from a file
 	data = np.genfromtxt(dataset[0], delimiter=',')
@@ -57,30 +90,25 @@ def     main(dataset):
 	Y = data[:, 1]
 	X = data[:, 0]
 	
+	# normalizing features
 	X = featureScaling(X)
-
 	#X = meanNormalization(X)
 
-	# adding bias column to X data
-	X = addBiasUnit(X)
-	print(X)
-	[history, iterations] = trainThetas(X, Y)
+	[history, iterations] = computeThetas(X, Y)
+#	normalEquation(X, Y)
 
 	plt.plot(iterations, history)
 	plt.ylabel('Function cost')
 	plt.xlabel('Iterations')
 	plt.show()
 	
-	data, = plt.plot(X[:, 1], Y, 'bo', label='Training data')
-	dummy_x = addBiasUnit(np.linspace(np.min(X), np.max(X), 100))
-	print(dummy_x)
-	plt.plot(dummy_x, dummy_x.dot(thetas))
-			#thetas[0] + (dummy_x * thetas[1]), 'r')
+	data, = plt.plot(X, Y, 'bo', label='Training data')
+	dummy_x = np.linspace(np.min(X), np.max(X), 100)
+	plt.plot(dummy_x, thetas[0] + (dummy_x * thetas[1]), 'r')
 	plt.ylabel('Price')
 	plt.xlabel('Mileage')
 	plt.legend()
 	plt.show()
-	
 	# saving thetas to temp file
 	with open('thetas.txt', 'w') as f:
 		for i in range(thetas.shape[0]):
