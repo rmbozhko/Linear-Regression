@@ -13,7 +13,8 @@ def main():
 			thetas = [theta.strip('\n') for theta in thetas]
 			thetas = [float(theta) for theta in thetas]
 			X = np.vstack((np.ones((1,), dtype=float), X)).T
-			result = h_function(X)
+			result = X.dot(thetas)#h_function(X)
+			print(thetas)
 			print(X)
 			print(result)
 			print("Predicted cost for a car with mileage({}): {}".format(''.join(str(el) for el in X[:, 1]), ''.join(str(el) for el in result)))

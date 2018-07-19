@@ -16,7 +16,7 @@ def 	computeCost(X, Y):
 
 	J = h_function(X)
 	J = np.sum(np.square(J - Y)) / (2 * Y.shape[0])
-	print("Cost function result: {}".format(J))
+	#print("Cost function result: {}".format(J))
 	return (J)
 
 def 	h_function(X):
@@ -29,19 +29,21 @@ def 	trainThetas(X, Y, learningRate=0.001, iterationsNum=1500):
 	# otherwise we should specify the axis of X which we are going to assign
 	m = Y.shape[0]
 	thetasHistory = list()
+	iterations = list()
 
 	for i in range(iterationsNum):
 		J = (h_function(X) - Y).dot(X)
-		J = np.divide(np.multiply(J, learningRate), m)
+		J = learningRate * np.divide(J, m)
 		thetas = thetas - J
 		thetasHistory.append(computeCost(X, Y))
-	return (thetasHistory)
+		iterations.append(i)
+
+	return (iterations, thetasHistory)
 
 def     main(dataset):
 	global thetas
 
 	iterationsNum = 1500
-	learningRate = 0.001
 
 	# reading data from a file
 	data = np.genfromtxt(dataset[0], delimiter=',')
@@ -50,44 +52,35 @@ def     main(dataset):
 
 	Y = data[:, 1]
 	X = data[:, 0]
-	#Y = featureScaling(Y)
-	#X = featureScaling(X)
+	
+	X = featureScaling(X)
 
-	Y = meanNormalization(Y)
-	X = meanNormalization(X)
+	#X = meanNormalization(X)
 
 	# adding bias column to X data
 	bias_arr = np.ones((Y.shape[0],), dtype=int)
 	X = np.vstack((bias_arr, X)).T
 
-	# visualizing data
-	#Y_data, = plt.plot(Y, 'ro', label='Y values')
-	#X_data, = plt.plot(X, 'bo', label='X values')
-	
-	#plt.legend()
-	#plt.show()
-	computeCost(X, Y)
+	[history, iterations] = trainThetas(X, Y)
 
-	history = trainThetas(X, Y)
-
-	plt.plot([i for i in range(iterationsNum)], history)
+	plt.plot(iterations, history)
+	plt.ylabel('Function cost')
+	plt.xlabel('Iterations')
 	plt.show()
-	#plt.x_label('Cost of a function')
-	#plt.y_label('Iterations')
-
-	computeCost(X, Y)
 	
-	Y_data, = plt.plot(Y, 'ro', label='Y values')
-	X_data, = plt.plot(X[:, 1], 'bo', label='X values')
-	print(thetas)
-	plt.plot(thetas)
+	data, = plt.plot(X[:, 1], Y, 'bo', label='Training data')
+	dummy = np.linspace(0, 1, 100)
+	
+	plt.plot(dummy, thetas[0] + dummy * thetas[1], 'r')
+	plt.ylabel('Price')
+	plt.xlabel('Mileage')
 	plt.legend()
 	plt.show()
-	f = open('thetas.txt', 'w')
-	for i in range(thetas.shape[0]):
-		f.write(str(thetas[i]) + "\n")
-	f.close()
-
+	
+	# saving thetas to temp file
+	with open('thetas.txt', 'w') as f:
+		for i in range(thetas.shape[0]):
+			f.write(str(thetas[i]) + "\n")
 
 if __name__ == '__main__':
 	# we can define what type of normalization do we apply: mean or feature, by introducing some kind of a flag
