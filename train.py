@@ -13,7 +13,7 @@ def 	featureScaling(data):
 	return (np.divide(data, max_value))
 
 def 	meanNormalization(data):
-	return (np.divide((data - np.mean(data)), np.amax(data)))
+	return (np.divide((data - np.mean(data)), np.std(data)))
 
 def 	computeCost(X, Y):
 	global thetas
@@ -81,7 +81,7 @@ def	computeThetas(X, y):
 	step = 0.1
 	
 	# determing best-fitting learningRate using brute-force	
-	while diff > 0.0001:
+	while diff > 0.000000000001:
 		for i in range(9):
 			if diff <= 0.0001:
 				break
@@ -89,6 +89,7 @@ def	computeThetas(X, y):
 			[history, iterations, thetasZeroStrg, thetasOneStrg] = gradientDescent(X, y, 0.5)
 			diff = calcAccuracy(X, y, False)
 		step = step * 0.1
+	print("learningRate:{}".format(learningRate))
 	return ([history, iterations, thetasZeroStrg, thetasOneStrg])
 
 def     main(dataset):
@@ -99,6 +100,7 @@ def     main(dataset):
 
 	Y = data[:, -1]
 	X = data[:, :-1]
+	X_old = data[:, :-1]
 	
 	thetas = np.zeros(X.shape[1] + 1)
 	
@@ -148,6 +150,11 @@ def     main(dataset):
 	with open('thetas.txt', 'w') as f:
 		for i in range(thetas.shape[0]):
 			f.write(str(thetas[i]) + "\n")
+	
+	# saving metrics to temp file
+	with open('metrics.txt', 'w') as f:
+		for i in range(X_old.shape[1]):
+			f.write(str(np.max(X_old[:, i])) + " " + str(np.mean(X_old[:, i])) + " " + str(np.std(X_old[:, i])) + "\n")
 
 if __name__ == '__main__':
 	# we can define what type of normalization do we apply: mean or feature, by introducing some kind of a flag
