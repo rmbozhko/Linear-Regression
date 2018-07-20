@@ -102,8 +102,3 @@ if __name__ == '__main__':
 	parser.add_argument('-data', dest='dataset', default=None, help='dataset with input values to predict output')
 	args = parser.parse_args()
 	main(args.dataset)
-	#else:
-	#	print("Usage: python " + __file__ + " [data.csv]")
-	#	print("\tdata.csv(optional) -- is a file with data to predict. Separate passed data with comma")
-	#	print("\tIf file isn't specified data is expected to be entered via console")
-	#	main()
