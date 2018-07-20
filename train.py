@@ -5,8 +5,10 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import argparse
 
 thetas = None 
+dataset = None
 
 def 	featureScaling(data):
 	max_value = np.amax(data)
@@ -26,11 +28,11 @@ def 	h_function(X):
 	global thetas
 	return (X.dot(thetas))
 
-#def	normalEquation(X, Y):
-#	thetas = np.zeros(2)
-
-#	thetas[1] = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y)
-#	print(thetas)
+def	normalEquation(X, Y):
+	global thetas
+	X = addBiasUnit(X)
+	# inv(X.T * X) * (X * y)
+	thetas = np.array(np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y))
 
 def 	gradientDescent(X, Y, learningRate=0.0001, iterationsNum=1500):
 	global thetas
@@ -92,32 +94,9 @@ def	computeThetas(X, y):
 	print("learningRate:{}".format(learningRate))
 	return ([history, iterations, thetasZeroStrg, thetasOneStrg])
 
-def     main(dataset):
+def	displayGraph(X, Y):
 	global thetas
 
-	# reading data from a file, except header line
-	data = np.genfromtxt(dataset[0], delimiter=',', skip_header=1)
-
-	Y = data[:, -1]
-	X = data[:, :-1]
-	X_old = data[:, :-1]
-	
-	thetas = np.zeros(X.shape[1] + 1)
-	
-	# normalizing features
-	X = featureScaling(X)
-	#X = meanNormalization(X)
-
-	# Computing thetas
-	[history, iterations, thetasZeroStrg, thetasOneStrg] = computeThetas(X, Y)
-#	normalEquation(X, Y)
-
-	# plotting cost function results
-	plt.plot(iterations, history)
-	plt.ylabel('Function cost')
-	plt.xlabel('Iterations')
-	plt.show()
-	
 	if X.shape[1] == 1:
 		# plotting 2D graph, with prediction line
 		plt.figure(1)	
@@ -144,6 +123,40 @@ def     main(dataset):
 		plt.legend()
 		plt.show()
 
+def     main(dataset):
+	global thetas
+	# reading data from a file, except header line
+	data = np.genfromtxt(dataset, delimiter=',', skip_header=1)
+
+	Y = data[:, -1]
+	X = data[:, :-1]
+	X_old = data[:, :-1]
+	
+	thetas = np.zeros(X.shape[1] + 1)
+	
+	# normalizing features
+	if args.is_fscale:
+		X = featureScaling(X)
+	else:
+		X = meanNormalization(X)
+
+	# Computing thetas
+	if args.is_norm:
+		normalEquation(X, Y)
+	else:
+		if args.is_sgd:
+			# implement stohastic gradient
+			[history, iterations, thetasZeroStrg, thetasOneStrg] = computeThetas(X, Y)
+		else:
+			[history, iterations, thetasZeroStrg, thetasOneStrg] = computeThetas(X, Y)
+			# plotting cost function results
+			plt.plot(iterations, history)
+			plt.ylabel('Function cost')
+			plt.xlabel('Iterations')
+			plt.show()
+	
+	displayGraph(X, Y)
+
 	print("Difference between calculated and passed output values: {}".format(calcAccuracy(addBiasUnit(X), Y, False)))
 	
 	# saving thetas to temp file
@@ -157,9 +170,14 @@ def     main(dataset):
 			f.write(str(np.max(X_old[:, i])) + " " + str(np.mean(X_old[:, i])) + " " + str(np.std(X_old[:, i])) + "\n")
 
 if __name__ == '__main__':
-	# we can define what type of normalization do we apply: mean or feature, by introducing some kind of a flag
-    if (len(sys.argv) > 1):
-        main(sys.argv[1:])
-    else:
-        print("No data is passed")
-        exit(-1)
+	dataset = None
+	parser = argparse.ArgumentParser(description='Train thetas for further precition.')
+	parser.add_argument('-norm', dest='is_norm', action='store_true',         default=False, help='choose normal equation as thetas training algorithm')
+	parser.add_argument('-bgd', dest='is_bgd', action='store_true',         default=True, help=' [default] choose batch gradient descent as thetas training algorithm')
+	parser.add_argument('-sgd', dest='is_sgd', action='store_true',         default=False, help='choose stohastic gradient descent as thetas training algorithm')
+	parser.add_argument('-meanNorm', dest='is_fscale', action='store_false', default=True, help='choose mean normalization as method to rescale input data')
+	parser.add_argument('-fscale', dest='is_fscale', action='store_true', default=True, help=' [default] choose feature scalling as method to rescale input data')
+	requiredArgs = parser.add_argument_group('Required arguments')
+	requiredArgs.add_argument('-data', help='dataset with input values to train thetas', required=True)
+	args = parser.parse_args()
+	main(args.data)
