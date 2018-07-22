@@ -76,7 +76,7 @@ def 	main(data):
 	if data is None and len(thetas) is 2:
 		while 1:
 			try:
-				X = float(input('Mileage for car: '))
+				X = float(input('Feature: '))
 			except ValueError:
 				print("Not a number")
 			else:
