@@ -8,7 +8,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
 thetas = None 
-dataset = None
 
 def 	featureScaling(data):
 	max_value = np.amax(data)
@@ -17,7 +16,14 @@ def 	featureScaling(data):
 def 	meanNormalization(data):
 	return (np.divide((data - np.mean(data)), np.std(data)))
 
-def 	computeCost(X, Y):
+def 	computeCostSGD(X, Y):
+	global thetas
+
+	J = h_function(X)
+	J = np.sum(np.square(J - Y) / 2) / (Y.shape[0])
+	return (J)
+
+def 	computeCostBGD(X, Y):
 	global thetas
 
 	J = h_function(X)
@@ -30,11 +36,11 @@ def 	h_function(X):
 
 def	normalEquation(X, Y):
 	global thetas
+	
 	X = addBiasUnit(X)
-	# inv(X.T * X) * (X * y)
 	thetas = np.array(np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y))
 
-def 	gradientDescent(X, Y, learningRate=0.0001, iterationsNum=1500):
+def 	SGD(X, Y, computeCost, h_function, learningRate=0.0001, iterationsNum=1500):
 	global thetas
 
 	# in case, when we have only one feature in X, we can assign m to X.size,
@@ -44,8 +50,29 @@ def 	gradientDescent(X, Y, learningRate=0.0001, iterationsNum=1500):
 	# Metrics storages
 	thetasHistory = list()
 	iterations = list()
-	thetasZeroStrg = list()
-	thetasOneStrg = list()
+
+	for j in range(iterationsNum):
+		for i in range(X.shape[0]):
+			X_temp = np.array([X[i, :]])
+			J = (h_function(X_temp) - Y[i]).dot(X_temp)
+			J = learningRate * J
+			thetas = thetas - J
+		# Metrics collecting
+		thetasHistory.append(computeCost(X, Y))
+		iterations.append(j)
+
+	return (iterations, thetasHistory)
+
+def	BGD(X, Y, computeCost, h_function, learningRate=0.0001, iterationsNum=1500):
+	global thetas
+
+	# in case, when we have only one feature in X, we can assign m to X.size,
+	# otherwise we should specify the axis of X which we are going to assign
+	m = Y.shape[0]
+	
+	# Metrics storages
+	thetasHistory = list()
+	iterations = list()
 
 	for i in range(iterationsNum):
 		J = (h_function(X) - Y).dot(X)
@@ -53,11 +80,10 @@ def 	gradientDescent(X, Y, learningRate=0.0001, iterationsNum=1500):
 		thetas = thetas - J
 		
 		# Metrics collecting
-		thetasZeroStrg.append(thetas[0])
-		thetasOneStrg.append(thetas[1])
 		thetasHistory.append(computeCost(X, Y))
 		iterations.append(i)
-	return (iterations, thetasHistory, thetasZeroStrg, thetasOneStrg)
+
+	return (iterations, thetasHistory)
 
 def	addBiasUnit(arr):
 	bias_arr = np.ones((arr.shape[0], 1), dtype=float)
@@ -73,7 +99,7 @@ def	calcAccuracy(X, Y, logReg=True):
 		pred = int(np.sum(Y - X.dot(thetas)))
 	return (pred)
 
-def	computeThetas(X, y):	
+def	computeThetas(X, y, gradDesc, h_func, computeCost):	
 	# adding bias column to X data
 	X = addBiasUnit(X)
 	
@@ -83,16 +109,17 @@ def	computeThetas(X, y):
 	step = 0.1
 	
 	# determing best-fitting learningRate using brute-force	
-	while diff > 0.000000000001:
+	while diff > 0.00000001:
 		for i in range(9):
-			if diff <= 0.0001:
+			if diff <= 0.0001 and diff >= 0:
 				break
 			learningRate = learningRate - step
-			[history, iterations, thetasZeroStrg, thetasOneStrg] = gradientDescent(X, y, 0.5)
+			[iterations, history] = gradDesc(X, y, computeCost, h_func, learningRate)
 			diff = calcAccuracy(X, y, False)
+			print("diff:{}".format(diff))
 		step = step * 0.1
 	print("learningRate:{}".format(learningRate))
-	return ([history, iterations, thetasZeroStrg, thetasOneStrg])
+	return ([history, iterations])
 
 def	displayGraph(X, Y):
 	global thetas
@@ -103,8 +130,8 @@ def	displayGraph(X, Y):
 		data, = plt.plot(X, Y, 'bo', label='Training data')
 		dummy_x = np.linspace(np.min(X), np.max(X), 100)
 		plt.plot(dummy_x, thetas[0] + (dummy_x * thetas[1]), 'r')
-		plt.ylabel('Price')
-		plt.xlabel('Mileage')	
+		plt.ylabel(u'X\u2081')
+		plt.xlabel(u'X\u2082')	
 		plt.legend()
 		plt.show()
 
@@ -145,15 +172,14 @@ def     main(dataset):
 		normalEquation(X, Y)
 	else:
 		if args.is_sgd:
-			# implement stohastic gradient
-			[history, iterations, thetasZeroStrg, thetasOneStrg] = computeThetas(X, Y)
+			[history, iterations] = computeThetas(X, Y, SGD, h_function, computeCostSGD)
 		else:
-			[history, iterations, thetasZeroStrg, thetasOneStrg] = computeThetas(X, Y)
+			[history, iterations] = computeThetas(X, Y, BGD, h_function, computeCostBGD)
 			# plotting cost function results
-			plt.plot(iterations, history)
-			plt.ylabel('Function cost')
-			plt.xlabel('Iterations')
-			plt.show()
+		plt.plot(iterations, history)
+		plt.ylabel('Function cost')
+		plt.xlabel('Iterations')
+		plt.show()
 	
 	displayGraph(X, Y)
 
@@ -170,7 +196,6 @@ def     main(dataset):
 			f.write(str(np.max(X_old[:, i])) + " " + str(np.mean(X_old[:, i])) + " " + str(np.std(X_old[:, i])) + "\n")
 
 if __name__ == '__main__':
-	dataset = None
 	parser = argparse.ArgumentParser(description='Train thetas for further precition.')
 	parser.add_argument('-norm', dest='is_norm', action='store_true',         default=False, help='choose normal equation as thetas training algorithm')
 	parser.add_argument('-bgd', dest='is_bgd', action='store_true',         default=True, help=' [default] choose batch gradient descent as thetas training algorithm')
