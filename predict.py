@@ -3,15 +3,15 @@ from train import addBiasUnit
 import sys
 import argparse
 
-def	featureScaling(X, amax):
+def		featureScaling(X, amax):
 	X = np.array([X / amax])
 	return (X)
 
-def	meanNormalization(X, avg, stddev):
+def		meanNormalization(X, avg, stddev):
 	X = np.array([np.divide((X - avg), stddev)])
 	return (X)
 
-def	calcResult(X, thetas, X_old):
+def		calcResult(X, thetas, X_old):
 	result = list()
 	
 	for i in range(X.shape[0]):
@@ -22,7 +22,7 @@ def	calcResult(X, thetas, X_old):
 		else:
 			print("Predicted output with following features ({}): {}".format(', '.join(str(el) for el in X_old[i, :]), ''.join(str(el) for el in result[i])))
 
-def	getDataFromFile(filename, amax, avg, stddev):
+def		getDataFromFile(filename, amax, avg, stddev):
 	features = list()
 	X = list()
 	
@@ -42,17 +42,17 @@ def	getDataFromFile(filename, amax, avg, stddev):
 	
 	return (np.array(features), np.array(X))
 
-def	getThetasFromFile(filename='thetas.txt'):
+def		getThetasFromFile(filename='thetas.txt'):
 	with open(filename, 'r') as f:
 		thetas = f.readlines()
 	thetas = [theta.strip('\n') for theta in thetas]
 	thetas = [float(theta) for theta in thetas]
 	return (thetas)
 
-def	h_function(X, thetas):
+def		h_function(X, thetas):
 	return (addBiasUnit(X).dot(thetas))
 
-def	getMetricsFromFile(filename='metrics.txt'):	
+def		getMetricsFromFile(filename='metrics.txt'):	
 	# metrics vars
 	amax = list()
 	avg = list()
@@ -70,30 +70,39 @@ def	getMetricsFromFile(filename='metrics.txt'):
 			stddev.append(float(metrics[2]))
 	return (amax, avg, stddev)
 
+def 	getDataFromConsole(thetas, amax, avg, stddev):
+	#cycle vars
+	i = 1
+	X = list()
+	upX = list()
+
+	while 1:
+		try:
+			value = float(input('Feature #' + str(i) + ': '))
+		except ValueError:
+			print("Not a number")
+			# exit() #- ?
+		else:
+			if (i < len(thetas)):
+				X.append(value)
+				if args.is_fscale:
+					upX.append(featureScaling(value, amax[i - 1]))
+				else:
+					upX.append(meanNormalization(value, avg[i - 1], stddev[i - 1]))
+				i = i + 1
+			if i == len(thetas):
+				break
+	return (np.array([upX]), np.array([X]))
+
 def 	main(data):
 	thetas = getThetasFromFile()
 	amax, avg, stddev = getMetricsFromFile()
-	if data is None and len(thetas) is 2:
-		while 1:
-			try:
-				X = float(input('Feature: '))
-			except ValueError:
-				print("Not a number")
-			else:
-				if args.is_fscale:
-					upX = np.array([featureScaling(X, amax[0])])
-				else:
-					upX = np.array([meanNormalization(X, avg[0], stddev[0])])
-				X = np.ndarray((1,1), buffer=np.array(X))
-				upX = np.ndarray((1,1), buffer=np.array(upX))
-				calcResult(upX, thetas, X)
-				return
+	if data is None: #and len(thetas) is 2:
+		upX, X = getDataFromConsole(thetas, amax, avg, stddev)
+		calcResult(upX, thetas, X)
 	elif data is not None:
 		upX, X = getDataFromFile(data, amax, avg, stddev)
 		calcResult(upX, thetas, X)
-	else:
-		print("No possibility to pass multiple features via console")
-
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Predict values considering retrieved thetas.')
