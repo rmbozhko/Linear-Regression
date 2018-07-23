@@ -34,7 +34,14 @@ def		normalEquation(X, Y):
 	global thetas
 	
 	X = addBiasUnit(X)
-	thetas = np.array(np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y))
+	print(X)
+	print(Y)
+	#X_transpose = np.transpose(X)
+	# Calculating theta
+	#thetas = np.linalg.inv(X_transpose.dot(X))
+	#thetas = thetas.dot(X_transpose)
+	#thetas = thetas.dot(Y)
+	thetas = np.array(np.linalg.pinv(X.T.dot(X)).dot(X.T).dot(Y))
 
 def 	SGD(X, Y, computeCost, h_function, learningRate=0.0001, iterationsNum=150, sorted=False):
 	global thetas
@@ -166,20 +173,20 @@ def     main(dataset):
 
 	Y = data[:, -1]
 	X = data[:, :-1]
+	print(X)
 	X_old = data[:, :-1]
 	
 	thetas = np.zeros(X.shape[1] + 1)
-	
-	# normalizing features
-	if args.is_fscale:
-		X = featureScaling(X)
-	else:
-		X = meanNormalization(X)
 
 	# Computing thetas
 	if args.is_norm:
 		normalEquation(X, Y)
 	else:
+		# normalizing features
+		if args.is_fscale:
+			X = featureScaling(X)
+		else:
+			X = meanNormalization(X)
 		if args.is_sgd:
 			[history, iterations] = computeThetas(X, Y, SGD, h_function, computeCostSGD)
 		else:
