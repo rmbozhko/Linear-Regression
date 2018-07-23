@@ -43,7 +43,7 @@ def 	SGD(X, Y, computeCost, h_function, learningRate=0.0001, iterationsNum=150, 
 	# otherwise we should specify the axis of X which we are going to assign
 	m = Y.shape[0]
 
-	# Check if sorted, otherwise shuffle randomly whole dataset
+	# Check if sorted, if so shuffle randomly whole dataset
 	# Handled both sorted datasets in ASC and DESC order
 	for i in range(1, X.shape[1]):
 		sorted = all(np.diff(X[:, i]) >= 0) or all(np.diff(X[:, i]) <= 0)
@@ -102,7 +102,7 @@ def		calcAccuracy(X, Y, logReg=True):
 		temp_y = X.dot(thetas)
 		pred = np.mean(Y == temp_y) * 100
 	else:
-		pred = float(np.sum(Y - X.dot(thetas)))
+		pred = int(np.sum(Y - X.dot(thetas)))
 	return (pred)
 
 def		computeThetas(X, y, gradDesc, h_func, computeCost):	
