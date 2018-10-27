@@ -1,30 +1,30 @@
+Expected values for data.csv:
+84000 - 6697.886708230222
+72000 - 6955.274271330649
+65000 - 7105.417016472565
+
 python train.py -meanNorm -data test_data/data.csv
 python predict.py -meanNorm -data in/in1.csv
-
-python train.py -meanNorm -data test_data/mult_data.csv
-python predict.py -meanNorm -data in/in2.csv
-
-python train.py -meanNorm -data test_data/ng.csv
-python predict.py -meanNorm -data in/in0.csv
-
 
 python train.py -data test_data/data.csv
 python predict.py -data in/in1.csv
 
+python train.py -mean -meanNorm -data test_data/data.csv
+python predict.py -meanNorm -data in/in1.csv
+
+python train.py -data test_data/data.csv
+python predict.py -data in/in1.csv
+
+python train.py -meanNorm -data test_data/mult_data.csv
+python predict.py -meanNorm -data in/in2.csv
+
 python train.py -data test_data/mult_data.csv
 python predict.py -data in/in2.csv
 
+python train.py -meanNorm -data test_data/ng.csv
+python predict.py -meanNorm -data in/in0.csv
+
 python train.py -data test_data/ng.csv
 python predict.py -data in/in0.csv
-
-
-python train.py -data test_data/data.csv
-python predict.py
-
-python train.py -data test_data/mult_data.csv
-python predict.py
-
-python train.py -data test_data/ng.csv
-python predict.py
 
 

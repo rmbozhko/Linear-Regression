@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import sys
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import argparse
@@ -34,13 +33,6 @@ def		normalEquation(X, Y):
 	global thetas
 	
 	X = addBiasUnit(X)
-	print(X)
-	print(Y)
-	#X_transpose = np.transpose(X)
-	# Calculating theta
-	#thetas = np.linalg.inv(X_transpose.dot(X))
-	#thetas = thetas.dot(X_transpose)
-	#thetas = thetas.dot(Y)
 	thetas = np.array(np.linalg.pinv(X.T.dot(X)).dot(X.T).dot(Y))
 
 def 	SGD(X, Y, computeCost, h_function, learningRate=0.0001, iterationsNum=150, sorted=False):
@@ -212,10 +204,10 @@ def     main(dataset):
 			f.write(str(np.max(X_old[:, i])) + " " + str(np.mean(X_old[:, i])) + " " + str(np.std(X_old[:, i])) + "\n")
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Train thetas for further precition.')
-	parser.add_argument('-norm', dest='is_norm', action='store_true',         default=False, help='choose normal equation as thetas training algorithm')
-	parser.add_argument('-bgd', dest='is_bgd', action='store_true',         default=True, help=' [default] choose batch gradient descent as thetas training algorithm')
-	parser.add_argument('-sgd', dest='is_sgd', action='store_true',         default=False, help='choose stohastic gradient descent as thetas training algorithm')
+	parser = argparse.ArgumentParser(description='Train thetas for further prediction.')
+	parser.add_argument('-norm', dest='is_norm', action='store_true', default=False, help='choose normal equation as thetas training algorithm')
+	parser.add_argument('-bgd', dest='is_bgd', action='store_true', default=True, help=' [default] choose batch gradient descent as thetas training algorithm')
+	parser.add_argument('-sgd', dest='is_sgd', action='store_true', default=False, help='choose stohastic gradient descent as thetas training algorithm')
 	parser.add_argument('-meanNorm', dest='is_fscale', action='store_false', default=True, help='choose mean normalization as method to rescale input data')
 	parser.add_argument('-fscale', dest='is_fscale', action='store_true', default=True, help=' [default] choose feature scalling as method to rescale input data')
 	requiredArgs = parser.add_argument_group('Required arguments')
