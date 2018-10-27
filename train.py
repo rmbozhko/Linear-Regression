@@ -3,33 +3,40 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import argparse
 
 thetas = None 
 
 def 	featureScaling(data):
+	''' Features normalization with respect to the biggest value of each feature'''
 	max_value = np.amax(data)
 	return (np.divide(data, max_value))
 
 def 	meanNormalization(data):
+	''' Features normalization with respect to their mean value'''
 	return (np.divide((data - np.mean(data)), np.std(data)))
 
 def 	computeCostSGD(X, Y):
+	''' Cost calculating function for Stohastic Gradient Descent'''
 	J = h_function(X)
 	J = np.sum(np.square(J - Y) / 2) / (Y.shape[0])
 	return (J)
 
 def 	computeCostBGD(X, Y):
+	''' Cost calculating function for Batch Gradient Descent'''
 	J = h_function(X)
 	J = np.sum(np.square(J - Y)) / (2 * Y.shape[0])
 	return (J)
 
 def 	h_function(X):
+	''' Hypotesis function for linear regression'''
 	global thetas
+
 	return (X.dot(thetas))
 
 def		normalEquation(X, Y):
+	'''Calculating thethas using Normal Equation(so called Newton's method)'''
+
 	global thetas
 	
 	X = addBiasUnit(X)
@@ -101,6 +108,7 @@ def		calcAccuracy(X, Y, logReg=True):
 		temp_y = X.dot(thetas)
 		pred = np.mean(Y == temp_y) * 100
 	else:
+		print(thetas)
 		pred = int(np.sum(Y - X.dot(thetas)))
 	return (pred)
 
@@ -144,19 +152,24 @@ def		displayGraph(X, Y):
 		plt.show()
 
 	elif X.shape[1] == 2:
-		# plotting 3D graph, with prediction line
-		fig = plt.figure(2)
-		ax = fig.add_subplot(111, projection='3d')
-		ax.scatter(X[:, 0], X[:, 1], Y, c='b', marker='o')
-		temp_x0 = np.linspace(np.min(X[:, 0]), np.max(X[:, 0]), 100)
-		temp_x1 = np.linspace(np.min(X[:, 1]), np.max(X[:, 1]), 100)
-		temp_y = np.array([thetas[0] + (thetas[1] * temp_x0), thetas[0] + (thetas[2] * temp_x1)])
-		ax.plot_surface(temp_x0, temp_x1, temp_y, rstride=4, cstride=4, alpha=0.8, cmap='Reds')
-		ax.set_xlabel(u'X\u2081')	
-		ax.set_ylabel(u'X\u2082')	
-		ax.set_zlabel('Y')
-		plt.legend()
-		plt.show()
+		try:
+			from mpl_toolkits.mplot3d import Axes3D
+		except Exception as e:
+			print("No 3D graph today ... ")
+		else:
+			# plotting 3D graph, with prediction line
+			fig = plt.figure(2)
+			ax = fig.add_subplot(111, projection='3d')
+			ax.scatter(X[:, 0], X[:, 1], Y, c='b', marker='o')
+			temp_x0 = np.linspace(np.min(X[:, 0]), np.max(X[:, 0]), 100)
+			temp_x1 = np.linspace(np.min(X[:, 1]), np.max(X[:, 1]), 100)
+			temp_y = np.array([thetas[0] + (thetas[1] * temp_x0), thetas[0] + (thetas[2] * temp_x1)])
+			ax.plot_surface(temp_x0, temp_x1, temp_y, rstride=4, cstride=4, alpha=0.8, cmap='Reds')
+			ax.set_xlabel(u'X\u2081')	
+			ax.set_ylabel(u'X\u2082')	
+			ax.set_zlabel('Y')
+			plt.legend()
+			plt.show()
 
 def     main(dataset):
 	global thetas
