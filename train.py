@@ -207,12 +207,12 @@ def     main(dataset):
 	print("Difference between calculated and passed output values: {}".format(calcAccuracy(addBiasUnit(X), Y, False)))
 	
 	# saving thetas to temp file
-	with open('thetas.txt', 'w') as f:
+	with open('thetas.txt', 'w+') as f:
 		for i in range(thetas.shape[0]):
 			f.write(str(thetas[i]) + "\n")
 	
 	# saving metrics to temp file
-	with open('metrics.txt', 'w') as f:
+	with open('metrics.txt', 'w+') as f:
 		for i in range(X_old.shape[1]):
 			f.write(str(np.max(X_old[:, i])) + " " + str(np.mean(X_old[:, i])) + " " + str(np.std(X_old[:, i])) + "\n")
 
