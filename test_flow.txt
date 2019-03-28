@@ -9,7 +9,7 @@ python predict.py -meanNorm -data in/in1.csv
 python train.py -data test_data/data.csv
 python predict.py -data in/in1.csv
 
-python train.py -mean -meanNorm -data test_data/data.csv
+python train.py -sgd -meanNorm -data test_data/data.csv
 python predict.py -meanNorm -data in/in1.csv
 
 python train.py -data test_data/data.csv

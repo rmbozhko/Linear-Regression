@@ -108,7 +108,6 @@ def		calcAccuracy(X, Y, logReg=True):
 		temp_y = X.dot(thetas)
 		pred = np.mean(Y == temp_y) * 100
 	else:
-		print(thetas)
 		pred = int(np.sum(Y - X.dot(thetas)))
 	return (pred)
 
@@ -178,7 +177,6 @@ def     main(dataset):
 
 	Y = data[:, -1]
 	X = data[:, :-1]
-	print(X)
 	X_old = data[:, :-1]
 	
 	thetas = np.zeros(X.shape[1] + 1)

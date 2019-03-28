@@ -112,7 +112,7 @@ def 	main(data):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Predict values considering retrieved thetas.')
 	parser.add_argument('-meanNorm', dest='is_mean', action='store_true', default=False, help='choose mean normalization as method to rescale input data')
-	parser.add_argument('-fscale', dest='is_fscale', action='store_true', default=False, help=' [default] choose feature scalling as method to rescale input data')
+	parser.add_argument('-fscale', dest='is_fscale', action='store_true', default=True, help=' [default] choose feature scalling as method to rescale input data')
 	parser.add_argument('-data', dest='dataset', default=None, help='dataset with input values to predict output')
 	args = parser.parse_args()
 	main(args.dataset)
