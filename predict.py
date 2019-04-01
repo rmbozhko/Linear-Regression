@@ -38,7 +38,6 @@ def		getDataFromFile(filename, amax, avg, stddev):
 					features.append([meanNormalization(float(row[i]), avg[i], stddev[i]) for i in range(len(row))])
 				else:
 					features.append([float(row[i]) for i in range(len(row))])
-				print(features)
 			except ValueError:
 				print("Not a number was found in a file " + filename)
 				exit()
@@ -84,7 +83,7 @@ def 	getDataFromConsole(thetas, amax, avg, stddev):
 			value = float(input('Feature #' + str(i) + ': '))
 		except ValueError:
 			print("Not a number")
-			# exit() #- ?
+			exit()
 		else:
 			if (i < len(thetas)):
 				X.append(value)
