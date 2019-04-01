@@ -13,7 +13,6 @@ def		meanNormalization(X, avg, stddev):
 
 def		calcResult(X, thetas, X_old):
 	result = list()
-	
 	for i in range(X.shape[0]):
 		try:
 			result.append(h_function(X[i].T, thetas))
@@ -45,10 +44,15 @@ def		getDataFromFile(filename, amax, avg, stddev):
 	return (np.array(features), np.array(X))
 
 def		getThetasFromFile(filename='thetas.txt'):
-	with open(filename, 'r') as f:
-		thetas = f.readlines()
-	thetas = [theta.strip('\n') for theta in thetas]
-	thetas = [float(theta) for theta in thetas]
+	thetas = [0, 0]
+
+	try:
+		with open(filename, 'r') as f:
+			thetas = f.readlines()
+		thetas = [theta.strip('\n') for theta in thetas]
+		thetas = [float(theta) for theta in thetas]
+	except Exception as e:
+		print("{}".format(e))
 	return (thetas)
 
 def		h_function(X, thetas):
@@ -101,7 +105,7 @@ def 	getDataFromConsole(thetas, amax, avg, stddev):
 def 	main(data):
 	thetas = getThetasFromFile()
 	amax, avg, stddev = getMetricsFromFile()
-	if data is None: #and len(thetas) is 2:
+	if data is None:
 		upX, X = getDataFromConsole(thetas, amax, avg, stddev)
 		calcResult(upX, thetas, X)
 	elif data is not None:
