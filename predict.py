@@ -52,7 +52,7 @@ def		getThetasFromFile(filename='thetas.txt'):
 		thetas = [theta.strip('\n') for theta in thetas]
 		thetas = [float(theta) for theta in thetas]
 	except Exception as e:
-		print("{}".format(e))
+		print("{} used for predicting process".format(e))
 	return (thetas)
 
 def		h_function(X, thetas):
@@ -60,20 +60,26 @@ def		h_function(X, thetas):
 
 def		getMetricsFromFile(filename='metrics.txt'):	
 	# metrics vars
-	amax = list()
-	avg = list()
-	stddev = list()
+	amax = [1]
+	avg = [1]
+	stddev = [1]
 
-	with open(filename, 'r') as f:
-		for metrics in f:
-			metrics = metrics.split(' ')
-			metrics[-1] = metrics[-1].strip('\n')
-			if len(metrics) is not 3:
-				print("Unsufficient number of metrics values")
-				exit()
-			amax.append(float(metrics[0]))
-			avg.append(float(metrics[1]))
-			stddev.append(float(metrics[2]))
+	try:
+		with open(filename, 'r') as f:
+			amax = list()
+			avg = list()
+			stddev = list()
+			for metrics in f:
+				metrics = metrics.split(' ')
+				metrics[-1] = metrics[-1].strip('\n')
+				if len(metrics) is not 3:
+					print("Unsufficient number of metrics values")
+					exit()
+				amax.append(float(metrics[0]))
+				avg.append(float(metrics[1]))
+				stddev.append(float(metrics[2]))
+	except Exception as e:
+		print("{} used for predicting process".format(e))
 	return (amax, avg, stddev)
 
 def 	getDataFromConsole(thetas, amax, avg, stddev):
